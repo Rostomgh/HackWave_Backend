@@ -1,4 +1,3 @@
-const express = require("express");
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
@@ -9,9 +8,9 @@ const LinkSchema = new Schema({
   },
   from: {
     email: {
-      type: String,  // The correct type for email is String
+      type: String,  
       required: true,
-      match: [/.+@.+\..+/, "Please enter a valid email address"],  // Regex to validate email format
+      match: [/.+@.+\..+/, "Please enter a valid email address"],  
     },
   },
   createdAt: {
@@ -19,5 +18,6 @@ const LinkSchema = new Schema({
     default: Date.now,
   },
 });
+const LinkModel= mongoose.model('LinkSchema', LinkSchema)
+module.exports=LinkModel
 
-module.exports = mongoose.model("Link", LinkSchema);
