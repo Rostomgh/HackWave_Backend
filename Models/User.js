@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Schema= mongoose.Schema
 const AgentSchema = new Schema({
   name:{type:String,required:true},
@@ -14,5 +15,4 @@ const AgentSchema = new Schema({
   });
 const AgentModel= mongoose.model('AgentSchema', AgentSchema)
 module.exports=AgentModel
-
   
