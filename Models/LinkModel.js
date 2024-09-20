@@ -17,8 +17,9 @@ const LinkSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-  status:{
+  disable:{
     type:String,
+    default:"inactive"
   }
 });
 const LinkModel= mongoose.model('LinkSchema', LinkSchema)
