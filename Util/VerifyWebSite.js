@@ -1,6 +1,8 @@
-import axios from "axios";
-import https from "https";
-import { launch } from "puppeteer";
+var https = require("https");
+var launch = require("puppeteer").launch;
+var axios = require("axios");
+var PNG = require("pngjs").PNG;
+var resemble = require("resemblejs");
 
 async function instance() {
   const browser = await launch({ headless: true });
@@ -71,11 +73,6 @@ async function payPage() {
   }
 }
 
-import axios from "axios";
-import { PNG } from "pngjs";
-import pixelmatch from "pixelmatch";
-
-// Function to download an image and convert it to PNG
 const fetchImageAsPNG = async (url) => {
   const response = await axios({
     url,
@@ -199,7 +196,6 @@ async function detectTermsInput(page) {
       for (const input of inputs) {
         let label = input.labels[0] || input.parentElement.children[1];
 
-        // If no label is found, check for nearby text
         if (!label) {
           const parent = input.parentElement;
           const siblings = parent.childNodes;
@@ -320,12 +316,19 @@ async function isFontClear(page) {
   }
 }
 
-export async function verifyWebsite(req, res) {
+async function verifyWebsite(req, res) {
   const { url } = req.body;
   try {
-    compareImages(imageUrl1, imageUrl2).then((result) => {
-      console.log(result);
-    });
+    const result = await resemble(
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcScM0Y-7TksLd88H5etyItSE5J9E4ffreJ0bw&s"
+    )
+      .compareTo(
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzi5qtFHTEChYCjpMor06MG61eu4DgMj9oZA&s"
+      )
+      .scaleToSameSize()
+      .onComplete((e) => {
+        res.json(e);
+      });
     // const { page, browser, captchaResult, isClear } = await payPage();
 
     // console.log("Detecting terms input...");
@@ -351,3 +354,5 @@ export async function verifyWebsite(req, res) {
       .json({ error: "An error occurred during website verification" });
   }
 }
+
+module.exports = { verifyWebsite };
