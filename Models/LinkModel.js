@@ -17,6 +17,9 @@ const LinkSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  status:{
+    type:String,
+  }
 });
 const LinkModel= mongoose.model('LinkSchema', LinkSchema)
 module.exports=LinkModel
