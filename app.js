@@ -5,8 +5,14 @@ const dotenv = require("dotenv");
 dotenv.config();
 app.use(express.json());
 const connectDB = require("./config/Db");
+const cors=require("cors")
 const Port = 3000;
 
+//cors
+app.use(cors({
+  origin: "*",
+  
+}))
 //Route Test
 app.get("/", (req, res) => {
   res.send("Hello World");
