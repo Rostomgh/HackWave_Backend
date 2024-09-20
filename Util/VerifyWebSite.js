@@ -1,7 +1,7 @@
-import axios from "axios";
-import https from "https";
-import { load } from "cheerio";
-import { parse } from "url";
+const  axios =require ("axios");
+const https =require ("https");
+const cheerio  =require ("cheerio");
+
 
 async function fetchContent(url) {
   try {
@@ -33,7 +33,7 @@ async function detectCaptcha(
           error: "Failed to fetch the website",
         };
 
-      const $ = load(html);
+      const $ = cheerio.load(html);
       let allContent = html;
 
       const scriptPromises = $("script[src]")
@@ -138,7 +138,7 @@ async function checkPrice(url, price) {
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
       },
     });
-    const $ = load(response.data);
+    const $ = cheerio.load(response.data);
 
     const normalizedPrice = price.toString().replace(/[^\d.,]/g, "");
     const priceRegex = new RegExp(`\\b${normalizedPrice}\\b`, "i");
@@ -198,7 +198,7 @@ function getComputedStyle(element) {
   };
 }
 
-export async function verifyWebsite(req, res) {
+ async function verifyWebsite(req, res) {
   const { url, price } = req.body;
   console.log("Received request:", { url, price });
 
@@ -217,3 +217,4 @@ export async function verifyWebsite(req, res) {
 
   res.json({ captcha, isSSL, fontIsClear });
 }
+module.exports = { verifyWebsite };

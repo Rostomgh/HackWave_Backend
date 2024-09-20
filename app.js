@@ -14,11 +14,14 @@ app.get("/", (req, res) => {
 // Path Route
 const routerAgent = require("./Router/AgentRouter");
 const routeClient= require("./Router/ClientRouter");
+const routeBotVerify = require("./Util/VerifyWebSite");
 
 
 //Router
 app.use("/api/v1/agent", routerAgent);
-app.use("/api/v1/client",routeClient)
+app.use("/api/v1/client",routeClient);
+
+app.post("/api/v1/botverify", routeBotVerify.verifyWebsite);
 
 const start = async () => {
   try {
