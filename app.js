@@ -22,6 +22,8 @@ app.use("/api/v1/client",routeClient)
 
 const start = async () => {
   try {
+    console.log(process.env.MONGOO_URI);
+    
     await connectDB(process.env.MONGOO_URI); 
     app.listen(Port, () => {
       console.log(`http://localhost:${Port}`);

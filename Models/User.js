@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Schema= mongoose.Schema
 const AgentSchema = new Schema({
+  
   name:{type:String,required:true},
   email:{type:String,required:true},
   password: {
@@ -8,7 +9,7 @@ const AgentSchema = new Schema({
     minlength: [8, "Password should be at least 8 characters"],
     required: true,
   },
-  role:{type:String,required:true},
+  role:{type:String,required:false},
   },
   {
     timestamps: true  

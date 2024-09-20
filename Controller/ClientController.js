@@ -1,7 +1,8 @@
 const LinkModel = require("../Models/LinkModel");
 
 const submitForm = async (req, res) => {
-  const { Url, email } = req.body;
+  const { Url,from } = req.body;
+  const {email}=from
 
   try {
     const newLink = new LinkModel({

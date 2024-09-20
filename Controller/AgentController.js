@@ -5,6 +5,8 @@ const bcrypt = require("bcrypt");
 
 const signup = async (req, res) => {
   const { name, email, password } = req.body;
+  console.log(req.body);
+  
 
   try {
     if (!name || !email || !password) {
@@ -14,7 +16,7 @@ const signup = async (req, res) => {
     const existe = await User.findOne({ email });
 
     if (name.length < 6) {
-      throw Error("username is too short");
+      throw Error("name is too short");
     }
 
     if (existe) {
@@ -40,10 +42,10 @@ const signup = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const data = await User.create({
-      username,
+      name,
       email,
       password: hashedPassword,
-      picture,
+      
       status: "User",
     });
 
