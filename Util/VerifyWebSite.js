@@ -1,24 +1,71 @@
 var https = require("https");
-var launch = require("puppeteer").launch;
+// var launch = require("puppeteer").launch;
 var axios = require("axios");
 var PNG = require("pngjs").PNG;
 var resemble = require("resemblejs");
+const puppeteer = require("puppeteer-core");
+const { connect } = require("puppeteer-real-browser");
+const UserAgent = require("user-agents");
 
 async function instance() {
-  const browser = await launch({ headless: true });
+  const browser = await puppeteer.launch({
+    headless: false,
+    executablePath:
+      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  });
   const page = await browser.newPage();
+
+  await page.setUserAgent(new UserAgent().random().toString());
+
+  // const { browser, page } = await connect({
+  //   headless: false,
+  //   customConfig: {},
+  //   turnstile: true,
+  //   connectOption: {},
+  //   disableXvfb: false,
+  //   ignoreAllFlags: false,
+  // });
+
   page.setDefaultNavigationTimeout(0);
 
   await page.setUserAgent(
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
   );
+
+  // Navigate to the login page
   await page.goto("https://www.naviguih.com/SignIn", {
     waitUntil: "networkidle2",
+    timeout: 60000, // Increase timeout to 60 seconds
   });
+
+  // Check for Cloudflare challenge
+  const cloudflareSelector = "#cf-challenge-running";
+  const hasCloudfareChallenge = await page.evaluate((sel) => {
+    return document.querySelector(sel) !== null;
+  }, cloudflareSelector);
+
+  if (hasCloudfareChallenge) {
+    console.log("Cloudflare challenge detected. Attempting to solve...");
+
+    await page.waitForFunction(
+      () => {
+        return document.querySelector("#cf-challenge-running") === null;
+      },
+      { timeout: 30000 }
+    );
+
+    console.log("Cloudflare challenge appears to be solved.");
+  }
+
   await page.type("#email", "anis.cheklat@satim.dz");
   await page.type("#password", "Anis.Cheklat123@");
-  await page.click("button");
-  await page.waitForNavigation({ waitUntil: "networkidle2" });
+
+  await Promise.all([
+    page.click("button"),
+    page.waitForNavigation({ waitUntil: "networkidle2", timeout: 60000 }),
+  ]);
+
+  console.log("Login process completed.");
 
   return { page, browser };
 }
@@ -72,54 +119,6 @@ async function payPage() {
     throw err;
   }
 }
-
-const fetchImageAsPNG = async (url) => {
-  const response = await axios({
-    url,
-    responseType: "arraybuffer", // Fetch image as binary data
-  });
-
-  return new Promise((resolve, reject) => {
-    const png = new PNG();
-    png.parse(response.data, (error, data) => {
-      if (error) reject(error);
-      else resolve(data);
-    });
-  });
-};
-
-const compareImages = async (url1, url2) => {
-  try {
-    const [img1, img2] = await Promise.all([
-      fetchImageAsPNG(url1),
-      fetchImageAsPNG(url2),
-    ]);
-
-    const { width, height } = img1;
-    const diff = new PNG({ width, height });
-
-    const numDiffPixels = pixelmatch(
-      img1.data,
-      img2.data,
-      diff.data,
-      width,
-      height,
-      { threshold: 0.1 }
-    );
-    const matchPercentage = (
-      (1 - numDiffPixels / (width * height)) *
-      100
-    ).toFixed(2);
-
-    console.log(`Match percentage: ${matchPercentage}%`);
-  } catch (error) {
-    console.error("Error comparing images:", error);
-  }
-};
-
-const imageUrl1 =
-  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzi5qtFHTEChYCjpMor06MG61eu4DgMj9oZA&s";
-const imageUrl2 = "https://www.naviguih.com/assets/cib_logo-BMnQXW-y.png";
 
 async function detectCaptcha(page) {
   const checkForCaptcha = async () => {
@@ -319,34 +318,32 @@ async function isFontClear(page) {
 async function verifyWebsite(req, res) {
   const { url } = req.body;
   try {
-    const result = await resemble(
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcScM0Y-7TksLd88H5etyItSE5J9E4ffreJ0bw&s"
-    )
-      .compareTo(
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzi5qtFHTEChYCjpMor06MG61eu4DgMj9oZA&s"
-      )
+    let CIBmatch;
+    await resemble("https://epayement.elit.dz/ressources/img/carte_CIB.jpg")
+      .compareTo("https://www.naviguih.com/assets/cib_logo-BMnQXW-y.png")
       .scaleToSameSize()
       .onComplete((e) => {
-        res.json(e);
+        CIBmatch = e.misMatchPercentage;
       });
-    // const { page, browser, captchaResult, isClear } = await payPage();
+    const { page, browser, captchaResult, isClear } = await payPage();
 
-    // console.log("Detecting terms input...");
-    // const termsInputResult = await detectTermsInput(page);
-    // console.log("Terms input detection result:", termsInputResult);
+    console.log("Detecting terms input...");
+    const termsInputResult = await detectTermsInput(page);
+    console.log("Terms input detection result:", termsInputResult);
 
-    // console.log("Checking SSL...");
-    // const isSSL = await checkSSL(url);
-    // console.log("SSL check result:", isSSL);
+    console.log("Checking SSL...");
+    const isSSL = await checkSSL(url);
+    console.log("SSL check result:", isSSL);
 
     // await browser.close();
 
-    // res.json({
-    //   isCaptcha: captchaResult,
-    //   isSSL,
-    //   isConditions: termsInputResult,
-    //   isClear,
-    // });
+    res.json({
+      isCaptcha: captchaResult,
+      isSSL,
+      isConditions: termsInputResult,
+      isClear,
+      CIBLogoMatch: CIBmatch > 40 ? false : true,
+    });
   } catch (error) {
     console.error("Error in verifyWebsite:", error);
     res

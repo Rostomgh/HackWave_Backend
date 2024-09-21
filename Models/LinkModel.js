@@ -2,26 +2,38 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const LinkSchema = new Schema({
-  Url: {
+  name: {
     type: String,
     required: true,
   },
-  from: {
-    email: {
-      type: String,  
-      required: true,
-      match: [/.+@.+\..+/, "Please enter a valid email address"],  
-    },
+  email: {
+    type: String,
+    required: true,
+  },
+  website: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  senderId: {
+    type: String,
+    required: true,
   },
   createdAt: {
     type: Date,
     default: Date.now,
   },
-  disable:{
-    type:String,
-    default:"inactive"
-  }
+  status: {
+    type: String,
+    default: "pending",
+  },
+  message: {
+    type: String,
+    default: "",
+  },
 });
-const LinkModel= mongoose.model('LinkSchema', LinkSchema)
-module.exports=LinkModel
-
+const LinkModel = mongoose.model("LinkSchema", LinkSchema);
+module.exports = LinkModel;
