@@ -6,7 +6,7 @@ dotenv.config();
 app.use(express.json());
 const connectDB = require("./config/Db");
 const cors=require("cors")
-const Port = 3000;
+const Port = 5000;
 
 //cors
 app.use(cors({
@@ -29,7 +29,7 @@ app.use("/api/v1/client",routeClient);
 
 app.post("/api/v1/botverify", routeBotVerify.verifyWebsite);
 
-const start = async () => {
+const start = async () => { 
   try {
     console.log(process.env.MONGOO_URI);
     
@@ -41,5 +41,4 @@ const start = async () => {
     console.error("Error starting the server:", error);
   }
 };
-
 start();
