@@ -5,12 +5,8 @@ const bcrypt = require("bcrypt");
 
 const signup = async (req, res) => {
   const { name, email, password } = req.body;
-<<<<<<< HEAD
   console.log(req.body );
   
-=======
-  console.log(req.body);
->>>>>>> 64eb25a23d93b923c418ba00ea6f384a056f420d
 
   try {
     if (!name || !email || !password) {
@@ -49,11 +45,7 @@ const signup = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-<<<<<<< HEAD
       
-=======
-
->>>>>>> 64eb25a23d93b923c418ba00ea6f384a056f420d
       status: "User",
     });
 
@@ -97,11 +89,6 @@ const login = async (req, res) => {
       name: existe.name,
       email: existe.email,
       status: existe.status,
-<<<<<<< HEAD
-=======
-      id: existe._id,
-      role: existe.role,
->>>>>>> 64eb25a23d93b923c418ba00ea6f384a056f420d
       token,
     });
   } catch (error) {
@@ -109,18 +96,4 @@ const login = async (req, res) => {
   }
 };
 
-<<<<<<< HEAD
 module.exports = { signup, login };
-=======
-const deleteUser = async (req, res) => {
-  const { id } = req.params;
-  try {
-    await User.findByIdAndDelete(id);
-    res.status(200).json({ message: "User deleted" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-module.exports = { signup, login, deleteUser };
->>>>>>> 64eb25a23d93b923c418ba00ea6f384a056f420d

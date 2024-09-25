@@ -1,6 +1,3 @@
-
-  
-
 const Schema = mongoose.Schema;
 const AgentSchema = new Schema(
   {
